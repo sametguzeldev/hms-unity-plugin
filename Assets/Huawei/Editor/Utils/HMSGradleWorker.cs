@@ -23,7 +23,8 @@ namespace HmsPlugin
             gradleSettings = new Dictionary<string, string[]>()
             {
                 { AccountToggleEditor.AccountKitEnabled, new string[]{ "com.huawei.hms:hwid:5.2.0.300" } },
-                { AdsToggleEditor.AdsKitEnabled, new string[]{ "com.huawei.hms:ads-lite:13.4.39.302", "com.huawei.hms:ads-consent:3.4.39.302", "com.huawei.hms:ads-identifier:3.4.39.302" } },
+                //{ AdsToggleEditor.AdsKitEnabled, new string[]{ "com.huawei.hms:ads-lite:13.4.28.305", "com.huawei.hms:ads-consent:3.4.28.305", "com.huawei.hms:ads-identifier:3.4.28.305" } },
+                { AdsToggleEditor.AdsKitEnabled, new string[]{ "com.huawei.hms:ads-lite:13.4.40.302", "com.huawei.hms:ads-consent:3.4.40.302", "com.huawei.hms:ads-identifier:3.4.40.302" } },
                 { AnalyticsToggleEditor.AnalyticsKitEnabled, new string[] { "com.huawei.hms:hianalytics:5.2.0.301" } },
                 { CrashToggleEditor.CrashKitEnabled, new string[] { "com.huawei.agconnect:agconnect-crash:1.4.2.301" } },
                 { GameServiceToggleEditor.GameServiceEnabled, new string[] { "com.huawei.hms:game:5.0.4.302" } },

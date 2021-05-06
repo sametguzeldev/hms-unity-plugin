@@ -5,17 +5,24 @@ using UnityEngine;
 using HuaweiMobileServices.Ads;
 using HmsPlugin;
 using UnityEngine.UI;
+using UnityEngine.Networking;
+using HuaweiMobileServices.Base;
 
 public class AdsDemoManager : MonoBehaviour
 {
     [SerializeField]
     private Toggle testAdStatusToggle;
 
+    [SerializeField]
+    private GameObject nativeAdObj;
+
     private void Start()
     {
+        HMSAdsKitManager.Instance.OnNativeAdLoaded = OnNativeAdLoaded;
         HMSAdsKitManager.Instance.OnRewarded = OnRewarded;
         HMSAdsKitManager.Instance.OnInterstitialAdClosed = OnInterstitialAdClosed;
         testAdStatusToggle.isOn = HMSAdsKitSettings.Instance.Settings.GetBool(HMSAdsKitSettings.UseTestAds);
+
     }
 
     public void ShowBannerAd()
@@ -32,6 +39,11 @@ public class AdsDemoManager : MonoBehaviour
     {
         Debug.Log("[HMS] AdsDemoManager ShowRewardedAd");
         HMSAdsKitManager.Instance.ShowRewardedAd();
+    }
+
+    public void NativeAd()
+    {
+        HMSAdsKitManager.Instance.LoadNativeAd();
     }
 
     public void ShowInterstitialAd()
@@ -55,5 +67,19 @@ public class AdsDemoManager : MonoBehaviour
         HMSAdsKitManager.Instance.SetTestAdStatus(testAdStatusToggle.isOn);
         HMSAdsKitManager.Instance.DestroyBannerAd();
         HMSAdsKitManager.Instance.LoadAllAds();
+    }
+
+    private void OnNativeAdLoaded()
+    {
+        nativeAdObj.gameObject.SetActive(true);
+        nativeAdObj.transform.Find("Image - NativeAd").GetComponent<RawImage>().texture = HMSAdsKitManager.Instance.GetNativeAdImage();
+        nativeAdObj.transform.Find("Text - Title").GetComponent<Text>().text = HMSAdsKitManager.Instance.GetNativeAdTitle();
+        nativeAdObj.transform.Find("Text - Ad Source").GetComponent<Text>().text = HMSAdsKitManager.Instance.GetNativeAdSource();
+        nativeAdObj.transform.Find("Button - Info").GetComponentInChildren<Text>().text = HMSAdsKitManager.Instance.GetNativeAdButtonInfo();
+        nativeAdObj.transform.Find("Button - Info").GetComponent<Button>().onClick.AddListener(() => 
+        { 
+            Application.OpenURL(HMSAdsKitManager.Instance.GetNativeAdClickUrl());
+            HMSAdsKitManager.Instance.RecordNativeAdClick();
+        });
     }
 }

@@ -4,7 +4,9 @@ using HuaweiMobileServices.Ads;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 using static HuaweiConstants.UnityBannerAdPositionCode;
 
 public class HMSAdsKitManager : HMSSingleton<HMSAdsKitManager>
@@ -17,6 +19,7 @@ public class HMSAdsKitManager : HMSSingleton<HMSAdsKitManager>
     private BannerAd bannerView;
     private InterstitialAd interstitialView;
     private RewardAd rewardedView;
+    public NativeAd nativeView;
 
     private Settings adsKitSettings;
 
@@ -330,6 +333,125 @@ public class HMSAdsKitManager : HMSSingleton<HMSAdsKitManager>
     public Action<Reward> OnRewarded { get; set; }
 
     #endregion
+
+    #endregion
+
+    #region NATIVE
+
+    public Action OnNativeAdLoaded { get; set; }
+
+    private class NativeAdLisstener : IAdListener
+    {
+        public void OnAdClicked()
+        {
+            Debug.Log("[HMS] HMSAdsKitManager OnNativeAdClicked");
+        }
+
+        public void OnAdClosed()
+        {
+            Debug.Log("[HMS] HMSAdsKitManager OnNativeAdClosed");
+        }
+
+        public void OnAdFailed(int reason)
+        {
+            Debug.Log("[HMS] HMSAdsKitManager OnNativeAdFailed");
+        }
+
+        public void OnAdImpression()
+        {
+            Debug.Log("[HMS] HMSAdsKitManager OnNativeAdImpression");
+        }
+
+        public void OnAdLeave()
+        {
+            Debug.Log("[HMS] HMSAdsKitManager OnNativeAdLeave");
+        }
+
+        public void OnAdLoaded()
+        {
+            Debug.Log("[HMS] HMSAdsKitManager OnNativeAdLoaded");
+        }
+
+        public void OnAdOpened()
+        {
+            Debug.Log("[HMS] HMSAdsKitManager OnNativeAdOpened");
+        }
+    }
+
+    public void LoadNativeAd()
+    {
+        if (!isInitialized) return;
+
+        Debug.Log("[HMS] HMSAdsKitManager Loading Native Ad.");
+        NativeAdLoader.Builder builder = new NativeAdLoader.Builder("testy63txaom86");
+        builder.SetAdListener(new NativeAdLisstener());
+        builder.SetNativeAdLoadedListener((ad) =>
+        {
+            nativeView = ad;
+            ad.SetAllowCustomClick();
+            OnNativeAdLoaded.Invoke();
+        });
+
+        NativeAdConfiguration configuration = new NativeAdConfiguration.Builder().SetChoicesPosition(2).Build;
+
+        NativeAdLoader nativeAdLoader = builder.SetNativeAdOptions(configuration).Build();
+        nativeAdLoader.LoadAd(new AdParam.Builder().Build());
+
+    }
+
+    public Texture GetNativeAdImage()
+    {
+        Texture texture = null;
+
+        if (nativeView != null && nativeView.Images.Count > 0)
+        {
+            UnityWebRequest www = UnityWebRequestTexture.GetTexture(nativeView.Images[0].Uri);
+            www.SendWebRequest();
+            while (!www.isDone) { }
+            texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+        }
+        return texture;
+    }
+
+    public string GetNativeAdTitle()
+    {
+        string title = string.Empty;
+        if (nativeView != null)
+            title = nativeView.Title;
+        return title;
+    }
+
+    public string GetNativeAdSource()
+    {
+        string adSource = string.Empty;
+        if (nativeView != null)
+            adSource = nativeView.AdSource;
+        return adSource;
+    }
+
+    public string GetNativeAdButtonInfo()
+    {
+        string buttonInfo = string.Empty;
+        if (nativeView != null)
+            buttonInfo = nativeView.CallToAction;
+        return buttonInfo;
+    }
+
+    public string GetNativeAdClickUrl()
+    {
+        string clickUrl = string.Empty;
+        if (nativeView != null)
+            clickUrl = nativeView.ClickUrl;
+        return clickUrl;
+    }
+
+    public void RecordNativeAdClick()
+    {
+        if (nativeView != null)
+        {
+            nativeView.RecordClickEvent();
+        }
+    }
 
     #endregion
 }
